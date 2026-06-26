@@ -1,0 +1,7 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.streamlit/
+yolov8*.pt
+.DS_Store
