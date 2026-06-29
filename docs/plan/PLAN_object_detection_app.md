@@ -11,7 +11,7 @@ object-detection-app/
 ├── app.py                  # Main Streamlit app
 ├── processor.py            # Logic WebRTC + YOLOv8
 ├── requirements.txt        # Dependencies
-├── packages.txt            # System packages (untuk Streamlit Cloud)
+├── runtime.txt             # Python runtime untuk Streamlit Cloud
 └── README.md
 ```
 
@@ -37,13 +37,14 @@ pillow==10.3.0
 > ⚠️ `ultralytics` sudah include YOLOv8 — tidak perlu install terpisah.  
 > ⚠️ Pakai `opencv-python-headless` bukan `opencv-python` untuk cloud deploy.
 > ⚠️ Tambahkan `--extra-index-url https://download.pytorch.org/whl/cpu` di `requirements.txt` supaya PyTorch yang terinstall adalah build CPU-only.
+> ⚠️ Pin Python ke `python-3.11` via `runtime.txt` agar wheel PyTorch tersedia.
 
-### `packages.txt`
-```
-libgl1
-libglib2.0-0
-ffmpeg
-```
+### System packages
+
+Tidak perlu `packages.txt` untuk deploy saat memakai `opencv-python-headless`
+dan wheel `av`. Menghapus file ini menghindari konflik apt package di
+Streamlit Cloud.
+
 
 ---
 
@@ -263,7 +264,7 @@ streamlit run app.py
 | Webcam tidak jalan di cloud | Pakai `streamlit-webrtc`, bukan `cv2.VideoCapture` |
 | Model lambat load | Load model di luar class (global), bukan di dalam `recv()` |
 | Memory limit di Streamlit Cloud | Fallback ke `yolov8n` jika `yolov8s` terlalu berat |
-| Error `libGL` di cloud | Sudah diatasi via `packages.txt` |
+| Error apt package di cloud | Jangan pakai `packages.txt` jika wheel Python sudah cukup |
 | Confidence terlalu banyak false positive | Naikkan slider threshold ke 0.6–0.7 |
 
 ---

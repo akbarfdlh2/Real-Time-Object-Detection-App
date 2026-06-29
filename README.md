@@ -28,7 +28,6 @@ https://real-time-object-detection-app-createdbyakbarfdlh.streamlit.app/
 - Webcam frame capture with PNG download
 - Adjustable confidence threshold from the sidebar
 - CPU-only PyTorch setup to avoid large CUDA downloads
-- Streamlit Cloud-ready system packages via `packages.txt`
 - Optional STUN configuration for cloud WebRTC connections
 
 ## Project Structure
@@ -38,7 +37,7 @@ https://real-time-object-detection-app-createdbyakbarfdlh.streamlit.app/
 ├── app.py
 ├── processor.py
 ├── requirements.txt
-├── packages.txt
+├── runtime.txt
 ├── README.md
 └── docs/
     └── plan/
