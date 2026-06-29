@@ -11,7 +11,7 @@ object-detection-app/
 ├── app.py                  # Main Streamlit app
 ├── processor.py            # Logic WebRTC + YOLOv8
 ├── requirements.txt        # Dependencies
-├── packages.txt            # Minimal system package untuk libGL
+├── packages.txt            # Minimal system packages untuk OpenCV
 └── README.md
 ```
 
@@ -45,10 +45,10 @@ pillow==10.3.0
 
 ```
 libgl1
+libglib2.0-0
 ```
 
-Jangan tambahkan `ffmpeg` atau `libglib2.0-0` karena bisa memicu konflik apt di
-Streamlit Cloud.
+Jangan tambahkan `ffmpeg` karena bisa memicu konflik apt di Streamlit Cloud.
 
 ---
 
@@ -268,8 +268,9 @@ streamlit run app.py
 | Webcam tidak jalan di cloud | Pakai `streamlit-webrtc`, bukan `cv2.VideoCapture` |
 | Model lambat load | Load model di luar class (global), bukan di dalam `recv()` |
 | Segmentation fault saat load YOLO | Pakai default `yolov8n`; `yolov8s` hanya via `YOLO_MODEL` di resource lebih besar |
-| `ImportError: libGL.so.1` di cloud | Isi `packages.txt` hanya dengan `libgl1` |
-| Error apt package di cloud | Jangan tambahkan `ffmpeg` atau `libglib2.0-0` |
+| `ImportError: libGL.so.1` di cloud | Tambahkan `libgl1` di `packages.txt` |
+| `ImportError: libgthread-2.0.so.0` di cloud | Tambahkan `libglib2.0-0` di `packages.txt` |
+| Error apt package di cloud | Jangan tambahkan `ffmpeg` |
 | Confidence terlalu banyak false positive | Naikkan slider threshold ke 0.6–0.7 |
 
 ---
