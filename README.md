@@ -1,7 +1,7 @@
 # Real-Time Object Detection App
 
 Real-time object detection from a browser webcam using Streamlit, WebRTC,
-OpenCV, and YOLOv8 small.
+OpenCV, and YOLOv8.
 
 ## Live Demo
 
@@ -14,7 +14,7 @@ https://real-time-object-detection-app-createdbyakbarfdlh.streamlit.app/
 - Python
 - Streamlit
 - streamlit-webrtc
-- YOLOv8 small from Ultralytics
+- YOLOv8 nano from Ultralytics by default
 - OpenCV
 - PyTorch CPU
 
@@ -37,7 +37,6 @@ https://real-time-object-detection-app-createdbyakbarfdlh.streamlit.app/
 ├── app.py
 ├── processor.py
 ├── requirements.txt
-├── runtime.txt
 ├── README.md
 └── docs/
     └── plan/
@@ -77,7 +76,7 @@ On Windows, activate the virtual environment with:
 .venv\Scripts\activate
 ```
 
-The first run downloads `yolov8s.pt` automatically.
+The first run downloads `yolov8n.pt` automatically.
 
 ## WebRTC Notes
 
@@ -104,9 +103,12 @@ WEBRTC_USE_STUN=true WEBRTC_STUN_URL=stun:stun.l.google.com:19302 streamlit run 
 4. Set the main file path to `app.py`.
 5. Deploy.
 
-The app uses `yolov8s.pt` for better accuracy. If memory or startup time is too
-tight on free-tier cloud resources, switch `MODEL_NAME` in `processor.py` back
-to `yolov8n.pt`.
+The app defaults to `yolov8n.pt` for Streamlit Cloud stability. To use the more
+accurate `yolov8s.pt` on a stronger machine, set:
+
+```bash
+YOLO_MODEL=yolov8s.pt streamlit run app.py
+```
 
 ## Author
 

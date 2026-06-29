@@ -11,7 +11,6 @@ object-detection-app/
 ├── app.py                  # Main Streamlit app
 ├── processor.py            # Logic WebRTC + YOLOv8
 ├── requirements.txt        # Dependencies
-├── runtime.txt             # Python runtime untuk Streamlit Cloud
 └── README.md
 ```
 
@@ -37,7 +36,7 @@ pillow==10.3.0
 > ⚠️ `ultralytics` sudah include YOLOv8 — tidak perlu install terpisah.  
 > ⚠️ Pakai `opencv-python-headless` bukan `opencv-python` untuk cloud deploy.
 > ⚠️ Tambahkan `--extra-index-url https://download.pytorch.org/whl/cpu` di `requirements.txt` supaya PyTorch yang terinstall adalah build CPU-only.
-> ⚠️ Pin Python ke `python-3.11` via `runtime.txt` agar wheel PyTorch tersedia.
+> ⚠️ Jika perlu ganti versi Python di Streamlit Cloud, atur dari Advanced settings saat deploy/redeploy.
 
 ### System packages
 
@@ -99,7 +98,7 @@ from ultralytics import YOLO
 from streamlit_webrtc import VideoProcessorBase
 
 # Load model sekali saat startup (bukan per-frame)
-model = YOLO("yolov8s.pt")  # small model — akurasi lebih tinggi
+model = YOLO(os.getenv("YOLO_MODEL", "yolov8n.pt"))  # cloud-safe default
 
 # Generate warna unik per class
 np.random.seed(42)
@@ -170,7 +169,7 @@ st.set_page_config(
 )
 
 st.title("🔍 Real-Time Object Detection")
-st.caption("Powered by YOLOv8 (small) + WebRTC")
+st.caption("Powered by YOLOv8 + WebRTC")
 
 # Sidebar: confidence threshold
 st.sidebar.header("⚙️ Settings")
@@ -183,7 +182,7 @@ confidence = st.sidebar.slider(
 )
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("**Model:** YOLOv8s (COCO)")
+st.sidebar.markdown("**Model:** YOLOv8n default / YOLOv8s optional")
 st.sidebar.markdown("**Objects:** 80 categories")
 st.sidebar.markdown("""
 **Contoh objek:**  
@@ -230,7 +229,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-> Pertama kali run, YOLOv8 otomatis download model weights `yolov8s.pt` (~22MB).  
+> Pertama kali run, YOLOv8 otomatis download model weights `yolov8n.pt` (~6MB).  
 > Jauh lebih kecil dari DeepFace, jadi lebih cepat siap.
 
 ---
@@ -253,7 +252,7 @@ streamlit run app.py
 | `yolov8s.pt` | ~22MB | ⚡⚡ | ⭐⭐⭐ | Balance |
 | `yolov8m.pt` | ~50MB | ⚡ | ⭐⭐⭐⭐ | High-end local |
 
-> App sekarang memakai `yolov8s.pt` untuk akurasi lebih tinggi. Jika memory cloud terbatas, fallback ke `yolov8n.pt`.
+> App default memakai `yolov8n.pt` untuk Streamlit Cloud. Untuk akurasi lebih tinggi di mesin yang cukup kuat, set `YOLO_MODEL=yolov8s.pt`.
 
 ---
 
@@ -263,7 +262,7 @@ streamlit run app.py
 |---|---|
 | Webcam tidak jalan di cloud | Pakai `streamlit-webrtc`, bukan `cv2.VideoCapture` |
 | Model lambat load | Load model di luar class (global), bukan di dalam `recv()` |
-| Memory limit di Streamlit Cloud | Fallback ke `yolov8n` jika `yolov8s` terlalu berat |
+| Segmentation fault saat load YOLO | Pakai default `yolov8n`; `yolov8s` hanya via `YOLO_MODEL` di resource lebih besar |
 | Error apt package di cloud | Jangan pakai `packages.txt` jika wheel Python sudah cukup |
 | Confidence terlalu banyak false positive | Naikkan slider threshold ke 0.6–0.7 |
 
@@ -276,7 +275,7 @@ streamlit run app.py
 - [x] Mode **upload image** selain webcam
 - [ ] Highlight warna khusus untuk objek tertentu (misal: hanya `person`)
 - [ ] Filter tampilkan **class tertentu** saja via multiselect
-- [x] Ganti model ke **YOLOv8s** untuk akurasi lebih tinggi
+- [x] Ganti model ke **YOLOv8s** untuk akurasi lebih tinggi via `YOLO_MODEL`
 
 ---
 

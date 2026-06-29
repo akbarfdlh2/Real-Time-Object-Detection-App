@@ -1,20 +1,29 @@
 from collections import Counter
+from functools import lru_cache
+import os
 from threading import Lock
 
 import av
 import cv2
 import numpy as np
 from streamlit_webrtc import VideoProcessorBase
+
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+
 from ultralytics import YOLO
 
-
-MODEL_NAME = "yolov8s.pt"
-MODEL_DISPLAY_NAME = "YOLOv8s"
-MODEL = YOLO(MODEL_NAME)
-CLASS_COUNT = len(MODEL.names)
+MODEL_NAME = os.getenv("YOLO_MODEL", "yolov8n.pt")
+MODEL_DISPLAY_NAME = MODEL_NAME.removesuffix(".pt").replace("yolov", "YOLOv")
+CLASS_COUNT = 80
 
 np.random.seed(42)
 COLORS = np.random.randint(0, 255, size=(CLASS_COUNT, 3), dtype=np.uint8)
+
+
+@lru_cache(maxsize=1)
+def get_model() -> YOLO:
+    return YOLO(MODEL_NAME)
 
 
 def _draw_detection(
@@ -64,8 +73,9 @@ def detect_objects(
 ) -> tuple[np.ndarray, dict[str, int]]:
     annotated_image = image.copy()
     object_counts: Counter[str] = Counter()
+    model = get_model()
 
-    results = MODEL.predict(
+    results = model.predict(
         annotated_image,
         conf=confidence_threshold,
         verbose=False,
@@ -76,7 +86,7 @@ def detect_objects(
             x1, y1, x2, y2 = map(int, detected_box.xyxy[0])
             class_id = int(detected_box.cls[0])
             confidence = float(detected_box.conf[0])
-            label = MODEL.names[class_id]
+            label = model.names[class_id]
             color = tuple(int(channel) for channel in COLORS[class_id % len(COLORS)])
 
             object_counts[label] += 1
