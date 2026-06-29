@@ -11,6 +11,7 @@ object-detection-app/
 ├── app.py                  # Main Streamlit app
 ├── processor.py            # Logic WebRTC + YOLOv8
 ├── requirements.txt        # Dependencies
+├── packages.txt            # Minimal system package untuk libGL
 └── README.md
 ```
 
@@ -27,23 +28,27 @@ streamlit-webrtc==0.72.2
 torch==2.2.2+cpu
 torchvision==0.17.2+cpu
 ultralytics==8.2.0
-opencv-python-headless==4.9.0.80
+opencv-python==4.9.0.80
 av==16.1.0
 numpy==1.26.4
 pillow==10.3.0
 ```
 
 > ⚠️ `ultralytics` sudah include YOLOv8 — tidak perlu install terpisah.  
-> ⚠️ Pakai `opencv-python-headless` bukan `opencv-python` untuk cloud deploy.
+> ⚠️ `ultralytics` membutuhkan `opencv-python`, jadi pin versinya eksplisit.
 > ⚠️ Tambahkan `--extra-index-url https://download.pytorch.org/whl/cpu` di `requirements.txt` supaya PyTorch yang terinstall adalah build CPU-only.
 > ⚠️ Jika perlu ganti versi Python di Streamlit Cloud, atur dari Advanced settings saat deploy/redeploy.
 
 ### System packages
 
-Tidak perlu `packages.txt` untuk deploy saat memakai `opencv-python-headless`
-dan wheel `av`. Menghapus file ini menghindari konflik apt package di
-Streamlit Cloud.
+`packages.txt` cukup berisi:
 
+```
+libgl1
+```
+
+Jangan tambahkan `ffmpeg` atau `libglib2.0-0` karena bisa memicu konflik apt di
+Streamlit Cloud.
 
 ---
 
@@ -263,7 +268,8 @@ streamlit run app.py
 | Webcam tidak jalan di cloud | Pakai `streamlit-webrtc`, bukan `cv2.VideoCapture` |
 | Model lambat load | Load model di luar class (global), bukan di dalam `recv()` |
 | Segmentation fault saat load YOLO | Pakai default `yolov8n`; `yolov8s` hanya via `YOLO_MODEL` di resource lebih besar |
-| Error apt package di cloud | Jangan pakai `packages.txt` jika wheel Python sudah cukup |
+| `ImportError: libGL.so.1` di cloud | Isi `packages.txt` hanya dengan `libgl1` |
+| Error apt package di cloud | Jangan tambahkan `ffmpeg` atau `libglib2.0-0` |
 | Confidence terlalu banyak false positive | Naikkan slider threshold ke 0.6–0.7 |
 
 ---
