@@ -98,7 +98,7 @@ from ultralytics import YOLO
 from streamlit_webrtc import VideoProcessorBase
 
 # Load model sekali saat startup (bukan per-frame)
-model = YOLO("yolov8n.pt")  # nano model — paling ringan, cocok untuk cloud
+model = YOLO("yolov8s.pt")  # small model — akurasi lebih tinggi
 
 # Generate warna unik per class
 np.random.seed(42)
@@ -169,7 +169,7 @@ st.set_page_config(
 )
 
 st.title("🔍 Real-Time Object Detection")
-st.caption("Powered by YOLOv8 (nano) + WebRTC")
+st.caption("Powered by YOLOv8 (small) + WebRTC")
 
 # Sidebar: confidence threshold
 st.sidebar.header("⚙️ Settings")
@@ -182,7 +182,7 @@ confidence = st.sidebar.slider(
 )
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("**Model:** YOLOv8n (COCO)")
+st.sidebar.markdown("**Model:** YOLOv8s (COCO)")
 st.sidebar.markdown("**Objects:** 80 categories")
 st.sidebar.markdown("""
 **Contoh objek:**  
@@ -229,7 +229,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-> Pertama kali run, YOLOv8 otomatis download model weights `yolov8n.pt` (~6MB).  
+> Pertama kali run, YOLOv8 otomatis download model weights `yolov8s.pt` (~22MB).  
 > Jauh lebih kecil dari DeepFace, jadi lebih cepat siap.
 
 ---
@@ -252,7 +252,7 @@ streamlit run app.py
 | `yolov8s.pt` | ~22MB | ⚡⚡ | ⭐⭐⭐ | Balance |
 | `yolov8m.pt` | ~50MB | ⚡ | ⭐⭐⭐⭐ | High-end local |
 
-> Untuk Streamlit Cloud (free tier), **pakai `yolov8n.pt`** — paling stabil.
+> App sekarang memakai `yolov8s.pt` untuk akurasi lebih tinggi. Jika memory cloud terbatas, fallback ke `yolov8n.pt`.
 
 ---
 
@@ -262,7 +262,7 @@ streamlit run app.py
 |---|---|
 | Webcam tidak jalan di cloud | Pakai `streamlit-webrtc`, bukan `cv2.VideoCapture` |
 | Model lambat load | Load model di luar class (global), bukan di dalam `recv()` |
-| Memory limit di Streamlit Cloud | Pakai `yolov8n` (nano), hindari model besar |
+| Memory limit di Streamlit Cloud | Fallback ke `yolov8n` jika `yolov8s` terlalu berat |
 | Error `libGL` di cloud | Sudah diatasi via `packages.txt` |
 | Confidence terlalu banyak false positive | Naikkan slider threshold ke 0.6–0.7 |
 
@@ -270,12 +270,12 @@ streamlit run app.py
 
 ## 🔧 Upgrade Ideas (Opsional)
 
-- [ ] Tambah **counter objek** per kategori (sidebar stats)
-- [ ] Tambah **screenshot** / capture frame
-- [ ] Mode **upload image** selain webcam
+- [x] Tambah **counter objek** per kategori (sidebar stats)
+- [x] Tambah **screenshot** / capture frame
+- [x] Mode **upload image** selain webcam
 - [ ] Highlight warna khusus untuk objek tertentu (misal: hanya `person`)
 - [ ] Filter tampilkan **class tertentu** saja via multiselect
-- [ ] Ganti model ke **YOLOv8s** untuk akurasi lebih tinggi
+- [x] Ganti model ke **YOLOv8s** untuk akurasi lebih tinggi
 
 ---
 
